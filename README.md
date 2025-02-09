@@ -1,4 +1,5 @@
-# AOD_PVAS
-Repo for AOD subsystem of PVAS Capstone
+Place [fileName].mp4 in directory:
+"AOD_PVAS\YOLOv8-DeepSORT-Object-Tracking\ultralytics\yolo\v8\detect"
 
-Just run each part of the "train_model.ipynb".
+Run this command in a terminal within the same directory:
+"python predict.py model=yolov8l.pt source="[fileName].mp4" show=True"
