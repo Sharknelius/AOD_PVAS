@@ -55,3 +55,4 @@ ultralytics/yolo/data/datasets/coco.yaml
 ultralytics/yolo/data/datasets/coco128-seg.yaml
 ultralytics/yolo/data/datasets/coco128.yaml
 ultralytics/yolo/data/datasets/xView.yaml
+ultralytics/yolo/v8/detect/deep_sort_pytorch/configs/deep_sort.yaml
