@@ -81,11 +81,15 @@ YOLOv8 Object Detection with DeepSORT Tracking(ID + Trails) </H1>
 
 - Goto the cloned folder.
 ```
-cd YOLOv8-DeepSORT-Object-Tracking/ultralytics/yolo/v8/detect
+cd YOLOv8-DeepSORT-Object-Tracking
 ```
 - Install the dependecies
 ```
 pip install -e '.[dev]'
+```
+- Goto directory
+```
+cd ultralytics/yolo/v8/detect
 ```
 - Downloading a Sample Video from the Google Drive
 ```

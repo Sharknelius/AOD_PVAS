@@ -15,6 +15,7 @@ ultralytics/hub/__init__.py
 ultralytics/hub/auth.py
 ultralytics/hub/session.py
 ultralytics/hub/utils.py
+ultralytics/models/v11/yolo11n.yaml
 ultralytics/models/v3/yolov3-spp.yaml
 ultralytics/models/v3/yolov3-tiny.yaml
 ultralytics/models/v3/yolov3.yaml
