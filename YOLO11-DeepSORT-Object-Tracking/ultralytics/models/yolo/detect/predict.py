@@ -32,17 +32,22 @@ object_counter1 = {}
 
 line = [(100, 500), (1050, 500)]
 speed_line_queue = {}
+
 def estimatespeed(Location1, Location2):
     #Euclidean Distance Formula
     d_pixel = math.sqrt(math.pow(Location2[0] - Location1[0], 2) + math.pow(Location2[1] - Location1[1], 2))
-    # defining thr pixels per meter
+    # defining the pixels per meter
     ppm = 8
     d_meters = d_pixel/ppm
+    # Frames per sec
     time_constant = 15*3.6
     #distance = speed/time
-    speed = d_meters * time_constant
+    speed_kmh = d_meters * time_constant
 
-    return int(speed)
+    # Convert to mph
+    speed_mph = speed_kmh * 0.621371
+
+    return int(speed_mph)
 
 def init_tracker():
     global deepsort
@@ -167,6 +172,7 @@ def get_direction(point1, point2):
         direction_str += ""
 
     return direction_str
+
 def draw_boxes(img, bbox, names,object_id, identities=None, offset=(0, 0)):
     cv2.line(img, line[0], line[1], (46,162,112), 3)
 
@@ -217,7 +223,7 @@ def draw_boxes(img, bbox, names,object_id, identities=None, offset=(0, 0)):
                     object_counter1[obj_name] += 1
 
         try:
-            label = label + " " + str(sum(speed_line_queue[id])//len(speed_line_queue[id])) + "km/h"
+            label = label + " " + str(sum(speed_line_queue[id])//len(speed_line_queue[id])) + "mph"
         except:
             pass
         UI_box(box, img, label=label, color=color, line_thickness=2)
