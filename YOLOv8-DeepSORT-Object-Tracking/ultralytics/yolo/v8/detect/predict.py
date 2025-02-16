@@ -31,11 +31,15 @@ def estimatespeed(Location1, Location2):
     # defining thr pixels per meter
     ppm = 3
     d_meters = d_pixel/ppm
+    # Frames per second
     time_constant = 15*3.6
     #distance = speed/time
-    speed = d_meters * time_constant
+    speed_kmh = d_meters * time_constant
+    # Convert to mph
+    speed_mph = speed_kmh * 0.621371
 
-    return int(speed)
+    return int(speed_mph)
+
 def init_tracker():
     global deepsort
     cfg_deep = get_config()
@@ -212,7 +216,7 @@ def draw_boxes(img, bbox, names,object_id, identities=None, offset=(0, 0)):
           '''
 
         try:
-            label = label + " " + str(sum(speed_line_queue[id])//len(speed_line_queue[id])) + "km/h"
+            label = label + " " + str(sum(speed_line_queue[id])//len(speed_line_queue[id])) + "mph"
         except:
             pass
         UI_box(box, img, label=label, color=color, line_thickness=2)
