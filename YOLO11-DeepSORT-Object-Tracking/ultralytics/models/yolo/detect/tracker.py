@@ -69,10 +69,10 @@ class ObjectCounter(BaseSolution):
                     action = "OUT"
                 self.counted_ids.append(track_id)
 
-        if action:
-            label = f"{self.names[cls]} ID: {track_id}"
-            speed = self.spd.get(track_id, 0)  # Get speed if available, else 0
-            # self.save_label_to_file(track_id, label, action, speed, self.names[cls])
+        """if action:
+            label = f"{self.names[cls]} ID: {track_id}, Speed: {int(self.spd.get(track_id, 0) * 0.621371)} mph"
+            self.annotator.box_label(self.boxes[self.track_ids.index(track_id)], label=label, color=(255, 0, 0))"""
+
 
     def store_classwise_counts(self, cls):
         """Initialize count dictionary for a given class."""
@@ -103,9 +103,11 @@ class ObjectCounter(BaseSolution):
 
             track_index = self.track_ids.index(track_id)
             cls = self.clss[track_index]
+            class_color = colors(int(cls), True)
+
             speed_label = f"{int(self.spd[track_id] * 0.621371)} mph" if track_id in self.spd else self.names[int(cls)]
-            combine_label = f"{speed_label}, ID: {track_id}"
-            self.annotator.box_label(self.boxes[self.track_ids.index(track_id)], label=combine_label, color=(255, 0, 0))
+            combine_label = f"{self.names[int(cls)]}, {speed_label}, ID: {track_id}"
+            self.annotator.box_label(self.boxes[self.track_ids.index(track_id)], label=combine_label, color=class_color)
 
     def count(self, im0):
         """Main counting function to track objects and store counts in the file."""
@@ -127,15 +129,15 @@ class ObjectCounter(BaseSolution):
 
             speed_label = f"{int(self.spd[track_id] * 0.621371)} mph" if track_id in self.spd else self.names[int(cls)]
             self.annotator.draw_centroid_and_tracks(self.track_line, color=colors(int(track_id), True), track_thickness=self.line_width)
-            if self.LineString([self.trk_pp[track_id], self.track_line[-1]]).intersects(self.r_s):
-                direction = "known"
-            else:
-                direction = "unknown"
-            if direction == "known" and track_id not in self.trkd_ids:
-                self.trkd_ids.append(track_id)
-                time_difference = time() - self.trk_pt[track_id]
-                if time_difference > 0:
-                    self.spd[track_id] = np.abs(self.track_line[-1][1] - self.trk_pp[track_id][1]) / time_difference
+            
+            # Always update speed estimation, regardless of intersection with line
+            time_difference = time() - self.trk_pt.get(track_id, time())
+            if time_difference > 0:
+                distance_moved = np.linalg.norm(np.array(self.track_line[-1]) - np.array(self.trk_pp.get(track_id, self.track_line[-1])))
+                self.spd[track_id] = distance_moved / time_difference  # Pixels per second
+
+            self.trk_pt[track_id] = time()
+            self.trk_pp[track_id] = self.track_line[-1]
 
             self.trk_pt[track_id] = time()
             self.trk_pp[track_id] = self.track_line[-1]
