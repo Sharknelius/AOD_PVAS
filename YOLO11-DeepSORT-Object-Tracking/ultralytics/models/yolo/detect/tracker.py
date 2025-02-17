@@ -23,10 +23,6 @@ class ObjectCounter(BaseSolution):
         self.show_in = self.CFG.get("show_in", True)
         self.show_out = self.CFG.get("show_out", True)
 
-        # Initialize CSV data storage
-        # self.csv_filename = self.get_daily_filename()
-        # self.create_csv()
-
     def count_objects(self, current_centroid, track_id, prev_position, cls):
         """Count objects and update file based on centroid movements."""
         if prev_position is None or track_id in self.counted_ids:
