@@ -408,7 +408,7 @@ class DetectionPredictor(BasePredictor):
 
         return log_string
 
-    @hydra.main(version_base=None, config_path=str(DEFAULT_CFG.parent), config_name=DEFAULT_CFG.name)
+    @hydra.main(version_base=None, config_path= "../../../cfg/solutions", config_name="default")
     def predict(cfg):
         init_tracker()
         cfg.model = cfg.model or "yolo11n.pt"
