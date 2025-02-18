@@ -2,7 +2,6 @@ import os
 import pandas as pd
 from datetime import datetime
 import numpy as np
-import torch
 from time import time
 from ultralytics.solutions.solutions import BaseSolution
 from ultralytics.utils.plotting import Annotator, colors
@@ -13,11 +12,9 @@ class ObjectCounter(BaseSolution):
         self.in_count = 0
         self.out_count = 0
         self.counted_ids = []
-        self.saved_ids = []
         self.classwise_counts = {}
         self.region_initialized = False
         self.spd = {}
-        self.trkd_ids = []
         self.trk_pt = {}
         self.trk_pp = {}
         self.show_in = self.CFG.get("show_in", True)
@@ -28,8 +25,8 @@ class ObjectCounter(BaseSolution):
         if prev_position is None or track_id in self.counted_ids:
             return
 
+        # For future use
         action = None
-        speed = None  # Initialize speed
 
         # Handle linear region counting
         if len(self.region) == 2:
@@ -69,11 +66,6 @@ class ObjectCounter(BaseSolution):
                     action = "OUT"
                 self.counted_ids.append(track_id)
 
-        """if action:
-            label = f"{self.names[cls]} ID: {track_id}, Speed: {int(self.spd.get(track_id, 0) * 0.621371)} mph"
-            self.annotator.box_label(self.boxes[self.track_ids.index(track_id)], label=label, color=(255, 0, 0))"""
-
-
     def store_classwise_counts(self, cls):
         """Initialize count dictionary for a given class."""
         if self.names[cls] not in self.classwise_counts:
@@ -92,6 +84,7 @@ class ObjectCounter(BaseSolution):
             self.annotator.display_analytics(im0, labels_dict, (104, 31, 17), (255, 255, 255), 10)
 
         for track_id in self.track_ids:
+            """
             if track_id in self.counted_ids:
                 in_count = self.in_count
                 label = f"ID:{track_id} count at number {in_count}"
@@ -100,6 +93,7 @@ class ObjectCounter(BaseSolution):
                 self.trk_pt[track_id] = 0
             if track_id not in self.trk_pp:
                 self.trk_pp[track_id] = self.track_line[-1]
+            """
 
             track_index = self.track_ids.index(track_id)
             cls = self.clss[track_index]
@@ -122,6 +116,7 @@ class ObjectCounter(BaseSolution):
         for box, track_id, cls in zip(self.boxes, self.track_ids, self.clss):
             self.store_tracking_history(track_id, box)
             self.store_classwise_counts(cls)
+
             if track_id not in self.trk_pt:
                 self.trk_pt[track_id] = 0
             if track_id not in self.trk_pp:
@@ -141,6 +136,7 @@ class ObjectCounter(BaseSolution):
 
             self.trk_pt[track_id] = time()
             self.trk_pp[track_id] = self.track_line[-1]
+
             current_centroid = ((box[0] + box[2]) / 2, (box[1] + box[3]) / 2)
             prev_position = self.track_history[track_id][-2] if len(self.track_history[track_id]) > 1 else None
             self.count_objects(current_centroid, track_id, prev_position, cls)

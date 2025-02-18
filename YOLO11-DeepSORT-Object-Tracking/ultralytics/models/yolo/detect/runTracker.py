@@ -16,12 +16,12 @@ region_points = [(100,352), (900, 352)]
 
 # Initialize the object counter
 counter = ObjectCounter(
-    region=region_points,  # Pass region points
-    model=os.path.join(os.getcwd(), "yolo11n.pt"),  # Model for object counting
-    classes=[0,1,2,3,5,7],  # Detect only person class
-    show_in=True,  # Display in counts
-    show_out=True,  # Display out counts
-    line_width=2,  # Adjust line width for display
+    region=region_points,
+    model=os.path.join(os.getcwd(), "yolo11n.pt"),
+    classes=[0,1,2,3,5,7],
+    show_in=True,
+    show_out=True,
+    line_width=2,
 )
 
 # Create a named window and set the mouse callback
