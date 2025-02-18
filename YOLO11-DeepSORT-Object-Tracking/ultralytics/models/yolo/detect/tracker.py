@@ -1,4 +1,4 @@
-import os
+import cv2
 import pandas as pd
 from datetime import datetime
 import numpy as np
@@ -7,10 +7,8 @@ from ultralytics.solutions.solutions import BaseSolution
 from ultralytics.utils.plotting import Annotator, colors
 
 class ObjectCounter(BaseSolution):
-    def __init__(self, **kwargs):
+    def __init__(self, output_filename="output.avi", **kwargs):
         super().__init__(**kwargs)
-        self.in_count = 0
-        self.out_count = 0
         self.counted_ids = []
         self.classwise_counts = {}
         self.region_initialized = False
@@ -19,6 +17,16 @@ class ObjectCounter(BaseSolution):
         self.trk_pp = {}
         self.show_in = self.CFG.get("show_in", True)
         self.show_out = self.CFG.get("show_out", True)
+
+        # Initialize video writer
+        self.video_writer = None
+        self.output_filename = output_filename
+
+    def initialize_writer(self, width, height):
+        """Initialize video writer if not already initialized."""
+        if self.video_writer is None:
+            fourcc = cv2.VideoWriter_fourcc(*'XVID') # Use XVID or MJPG codec
+            self.video_writer = cv2.VideoWriter(self.output_filename, fourcc, 20.0, (width, height))
 
     def count_objects(self, current_centroid, track_id, prev_position, cls):
         """Count objects and update file based on centroid movements."""
@@ -34,21 +42,13 @@ class ObjectCounter(BaseSolution):
             if line.intersects(self.LineString([prev_position, current_centroid])):
                 if abs(self.region[0][0] - self.region[1][0]) < abs(self.region[0][1] - self.region[1][1]):
                     if current_centroid[0] > prev_position[0]:
-                        self.in_count += 1
-                        self.classwise_counts[self.names[cls]]["IN"] += 1
                         action = "IN"
                     else:
-                        self.out_count += 1
-                        self.classwise_counts[self.names[cls]]["OUT"] += 1
                         action = "OUT"
                 else:
                     if current_centroid[1] > prev_position[1]:
-                        self.in_count += 1
-                        self.classwise_counts[self.names[cls]]["IN"] += 1
                         action = "IN"
                     else:
-                        self.out_count += 1
-                        self.classwise_counts[self.names[cls]]["OUT"] += 1
                         action = "OUT"
                 self.counted_ids.append(track_id)
 
@@ -57,19 +57,10 @@ class ObjectCounter(BaseSolution):
             polygon = self.Polygon(self.region)
             if polygon.contains(self.Point(current_centroid)):
                 if current_centroid[0] > prev_position[0]:
-                    self.in_count += 1
-                    self.classwise_counts[self.names[cls]]["IN"] += 1
                     action = "IN"
                 else:
-                    self.out_count += 1
-                    self.classwise_counts[self.names[cls]]["OUT"] += 1
                     action = "OUT"
                 self.counted_ids.append(track_id)
-
-    def store_classwise_counts(self, cls):
-        """Initialize count dictionary for a given class."""
-        if self.names[cls] not in self.classwise_counts:
-            self.classwise_counts[self.names[cls]] = {"IN": 0, "OUT": 0}
 
     def display_counts(self, im0):
         """Display the counts and actions on the image."""
@@ -84,17 +75,6 @@ class ObjectCounter(BaseSolution):
             self.annotator.display_analytics(im0, labels_dict, (104, 31, 17), (255, 255, 255), 10)
 
         for track_id in self.track_ids:
-            """
-            if track_id in self.counted_ids:
-                in_count = self.in_count
-                label = f"ID:{track_id} count at number {in_count}"
-
-            if track_id not in self.trk_pt:
-                self.trk_pt[track_id] = 0
-            if track_id not in self.trk_pp:
-                self.trk_pp[track_id] = self.track_line[-1]
-            """
-
             track_index = self.track_ids.index(track_id)
             cls = self.clss[track_index]
             class_color = colors(int(cls), True)
@@ -115,7 +95,6 @@ class ObjectCounter(BaseSolution):
 
         for box, track_id, cls in zip(self.boxes, self.track_ids, self.clss):
             self.store_tracking_history(track_id, box)
-            self.store_classwise_counts(cls)
 
             if track_id not in self.trk_pt:
                 self.trk_pt[track_id] = 0
@@ -142,4 +121,18 @@ class ObjectCounter(BaseSolution):
             self.count_objects(current_centroid, track_id, prev_position, cls)
 
         self.display_counts(im0)
+
+        # Initialize writer with frame dimensions
+        height, width, _ = im0.shape
+        self.initialize_writer(width, height)
+
+        # Write frame to video
+        self.video_writer.write(im0)
+
         return im0
+    
+    def close(self):
+        """Release the video writer."""
+        if self.video_writer:
+            self.video_writer.release()
+            print(f"Video saved as {self.output_filename}")
