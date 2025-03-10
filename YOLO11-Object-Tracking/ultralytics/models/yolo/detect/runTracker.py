@@ -8,8 +8,16 @@ def RGB(event, x, y, flags, param):
         point = [x, y]
         print(f"Mouse moved to: {point}")
 
-# Open the video file
-cap = cv2.VideoCapture('test2.mp4')
+ret = False # Set to true if recording live
+
+if ret:
+    cap = cv2.VideoCapture(0) # Live video feed
+else:
+    cap = cv2.VideoCapture('test3.mp4') # Load mp4
+
+# Get the default frame width and height
+frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
 # Define region points for counting
 region_points = [(100,352), (900, 352)]
