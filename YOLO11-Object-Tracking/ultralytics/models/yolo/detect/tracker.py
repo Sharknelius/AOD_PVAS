@@ -1,4 +1,6 @@
 import cv2
+import glob
+import os
 import pandas as pd
 from datetime import datetime
 import numpy as np
@@ -7,7 +9,7 @@ from ultralytics.solutions.solutions import BaseSolution
 from ultralytics.utils.plotting import Annotator, colors
 
 class ObjectCounter(BaseSolution):
-    def __init__(self, output_filename="output/output.avi", **kwargs):
+    def __init__(self, output_dir="output", output_prefix="output", **kwargs):
         super().__init__(**kwargs)
         self.counted_ids = []
         self.classwise_counts = {}
@@ -20,7 +22,19 @@ class ObjectCounter(BaseSolution):
 
         # Initialize video writer
         self.video_writer = None
-        self.output_filename = output_filename
+
+        os.makedirs(output_dir, exist_ok=True)
+        existing_files = glob.glob(os.path.join(output_dir, f"{output_prefix}_*.avi"))
+        file_numbers = [
+            int(f.split("_")[-1].split(".")[0]) for f in existing_files if f.split("_")[-1].split(".")[0].isdigit()
+        ]
+
+        if file_numbers:
+            next_number = max(file_numbers) + 1
+        else:
+            next_number = 1
+
+        self.output_filename = os.path.join(output_dir, f"{output_prefix}_{next_number}.avi")
 
     def initialize_writer(self, width, height):
         """Initialize video writer if not already initialized."""
@@ -83,8 +97,14 @@ class ObjectCounter(BaseSolution):
             combine_label = f"{self.names[int(cls)]}, {speed_label}, ID: {track_id}"
             self.annotator.box_label(self.boxes[self.track_ids.index(track_id)], label=combine_label, color=class_color)
 
-    def count(self, im0):
+    def count(self, im0, confidence_threshold=0.1):
         """Main counting function to track objects and store counts in the file."""
+        # ✅ Run YOLO model to detect objects in the frame
+        self.results = self.model(im0)  # Make sure you have a YOLO model loaded
+        
+        if not self.results:
+            return im0  # No detections, return the original frame
+
         if not self.region_initialized:
             self.initialize_region()
             self.region_initialized = True
@@ -94,6 +114,7 @@ class ObjectCounter(BaseSolution):
         self.annotator.draw_region(reg_pts=self.region, color=(104, 0, 123), thickness=self.line_width * 2)
 
         for box, track_id, cls in zip(self.boxes, self.track_ids, self.clss):
+
             self.store_tracking_history(track_id, box)
 
             if track_id not in self.trk_pt:
