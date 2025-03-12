@@ -131,7 +131,7 @@ class ObjectCounter(BaseSolution):
                 distance_moved = np.linalg.norm(np.array(self.track_line[-1]) - np.array(self.trk_pp.get(track_id, self.track_line[-1])))
                 self.spd[track_id] = distance_moved / time_difference  # Pixels per second
             
-            # If speed increases by 30% (FOR NOW), and trail is going south, ALERT
+            # If speed increases by 40% (FOR NOW), and trail is going south, ALERT
             if self.spd[track_id] > previous_speed * 1.4:
                 current_y = self.track_line[-1][1]
                 previous_y = self.trk_pp[track_id][1]
