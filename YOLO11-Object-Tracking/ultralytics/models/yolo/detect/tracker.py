@@ -97,10 +97,9 @@ class ObjectCounter(BaseSolution):
             combine_label = f"{self.names[int(cls)]}, {speed_label}, ID: {track_id}"
             self.annotator.box_label(self.boxes[self.track_ids.index(track_id)], label=combine_label, color=class_color)
 
-    def count(self, im0, confidence_threshold=0.1):
+    def count(self, im0):
         """Main counting function to track objects and store counts in the file."""
-        # ✅ Run YOLO model to detect objects in the frame
-        self.results = self.model(im0)  # Make sure you have a YOLO model loaded
+        self.results = self.model(im0)
         
         if not self.results:
             return im0  # No detections, return the original frame
@@ -125,11 +124,20 @@ class ObjectCounter(BaseSolution):
             speed_label = f"{int(self.spd[track_id] * 0.621371)} mph" if track_id in self.spd else self.names[int(cls)]
             self.annotator.draw_centroid_and_tracks(self.track_line, color=colors(int(track_id), True), track_thickness=self.line_width)
             
-            # Always update speed estimation, regardless of intersection with line
+            # Update speed estimation
+            previous_speed = self.spd.get(track_id, 0)  # Store previous speed
             time_difference = time() - self.trk_pt.get(track_id, time())
             if time_difference > 0:
                 distance_moved = np.linalg.norm(np.array(self.track_line[-1]) - np.array(self.trk_pp.get(track_id, self.track_line[-1])))
                 self.spd[track_id] = distance_moved / time_difference  # Pixels per second
+            
+            # If speed increases by 30% (FOR NOW), and trail is going south, ALERT
+            if self.spd[track_id] > previous_speed * 1.4:
+                current_y = self.track_line[-1][1]
+                previous_y = self.trk_pp[track_id][1]
+            
+                if current_y > previous_y:  # Temp Alert
+                    print(f"Object {track_id} is accelerating south. Speed: {self.spd[track_id]:.2f} pixels/sec")
 
             self.trk_pt[track_id] = time()
             self.trk_pp[track_id] = self.track_line[-1]
@@ -137,6 +145,7 @@ class ObjectCounter(BaseSolution):
             self.trk_pt[track_id] = time()
             self.trk_pp[track_id] = self.track_line[-1]
 
+            # Tracking center
             current_centroid = ((box[0] + box[2]) / 2, (box[1] + box[3]) / 2)
             prev_position = self.track_history[track_id][-2] if len(self.track_history[track_id]) > 1 else None
             self.count_objects(current_centroid, track_id, prev_position, cls)
