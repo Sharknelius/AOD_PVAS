@@ -99,10 +99,10 @@ class ObjectCounter(BaseSolution):
 
     def count(self, im0):
         """Main counting function to track objects and store counts in the file."""
-        self.results = self.model(im0)
+        #self.results = self.model(im0)
         
-        if not self.results:
-            return im0  # No detections, return the original frame
+        #if not self.results:
+         #   return im0  # No detections, return the original frame
 
         if not self.region_initialized:
             self.initialize_region()
