@@ -9,7 +9,7 @@ def RGB(event, x, y, flags, param):
         print(f"Mouse moved to: {point}")
 
 # Open the video file
-cap = cv2.VideoCapture('test2.mp4')
+cap = cv2.VideoCapture('realTest2.mp4')
 
 # Define region points for counting
 region_points = [(100,352), (900, 352)]

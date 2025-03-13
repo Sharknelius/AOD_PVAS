@@ -15,6 +15,7 @@ class ObjectCounter(BaseSolution):
         self.spd = {}
         self.trk_pt = {}
         self.trk_pp = {}
+        self.trk_pa = {}
         self.show_in = self.CFG.get("show_in", True)
         self.show_out = self.CFG.get("show_out", True)
 
@@ -79,7 +80,7 @@ class ObjectCounter(BaseSolution):
             cls = self.clss[track_index]
             class_color = colors(int(cls), True)
 
-            speed_label = f"{int(self.spd[track_id] * 0.621371)} mph" if track_id in self.spd else self.names[int(cls)]
+            speed_label = f"{int(self.spd[track_id])} mph" if track_id in self.spd else self.names[int(cls)]
             combine_label = f"{self.names[int(cls)]}, {speed_label}, ID: {track_id}"
             self.annotator.box_label(self.boxes[self.track_ids.index(track_id)], label=combine_label, color=class_color)
 
@@ -100,24 +101,33 @@ class ObjectCounter(BaseSolution):
                 self.trk_pt[track_id] = 0
             if track_id not in self.trk_pp:
                 self.trk_pp[track_id] = self.track_line[-1]
+            if track_id not in self.trk_pa:
+                self.trk_pa[track_id] = 1
 
-            speed_label = f"{int(self.spd[track_id] * 0.621371)} mph" if track_id in self.spd else self.names[int(cls)]
+            speed_label = f"{int(self.spd[track_id])} mph" if track_id in self.spd else self.names[int(cls)]
             self.annotator.draw_centroid_and_tracks(self.track_line, color=colors(int(track_id), True), track_thickness=self.line_width)
+
+            current_area = (box[2] - box[0]) * (box[3] - box[1])
             
             # Always update speed estimation, regardless of intersection with line
             time_difference = time() - self.trk_pt.get(track_id, time())
             if time_difference > 0:
-                distance_moved = np.linalg.norm(np.array(self.track_line[-1]) - np.array(self.trk_pp.get(track_id, self.track_line[-1])))
-                self.spd[track_id] = distance_moved / time_difference  # Pixels per second
-
-            self.trk_pt[track_id] = time()
-            self.trk_pp[track_id] = self.track_line[-1]
-
-            self.trk_pt[track_id] = time()
-            self.trk_pp[track_id] = self.track_line[-1]
+                distance_moved = current_area / self.trk_pa[track_id]
+                if distance_moved < 1.035 and distance_moved > 0.965:
+                    distance_moved = 0
+                distance_moved *= 3
+                self.spd[track_id] = distance_moved / time_difference  # Percentage area change per second
 
             current_centroid = ((box[0] + box[2]) / 2, (box[1] + box[3]) / 2)
             prev_position = self.track_history[track_id][-2] if len(self.track_history[track_id]) > 1 else None
+
+            self.trk_pt[track_id] = time()
+            self.trk_pp[track_id] = self.track_line[-1]
+
+            self.trk_pt[track_id] = time()
+            self.trk_pp[track_id] = self.track_line[-1]
+            self.trk_pa[track_id] = current_area
+
             self.count_objects(current_centroid, track_id, prev_position, cls)
 
         self.display_counts(im0)
