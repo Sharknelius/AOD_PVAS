@@ -1,4 +1,6 @@
 import cv2
+import glob
+import os
 import pandas as pd
 from datetime import datetime
 import numpy as np
@@ -7,7 +9,7 @@ from ultralytics.solutions.solutions import BaseSolution
 from ultralytics.utils.plotting import Annotator, colors
 
 class ObjectCounter(BaseSolution):
-    def __init__(self, output_filename="output/output.avi", **kwargs):
+    def __init__(self, output_dir="output", output_prefix="output", **kwargs):
         super().__init__(**kwargs)
         self.counted_ids = []
         self.classwise_counts = {}
@@ -20,7 +22,19 @@ class ObjectCounter(BaseSolution):
 
         # Initialize video writer
         self.video_writer = None
-        self.output_filename = output_filename
+
+        os.makedirs(output_dir, exist_ok=True)
+        existing_files = glob.glob(os.path.join(output_dir, f"{output_prefix}_*.avi"))
+        file_numbers = [
+            int(f.split("_")[-1].split(".")[0]) for f in existing_files if f.split("_")[-1].split(".")[0].isdigit()
+        ]
+
+        if file_numbers:
+            next_number = max(file_numbers) + 1
+        else:
+            next_number = 1
+
+        self.output_filename = os.path.join(output_dir, f"{output_prefix}_{next_number}.avi")
 
     def initialize_writer(self, width, height):
         """Initialize video writer if not already initialized."""
@@ -85,6 +99,11 @@ class ObjectCounter(BaseSolution):
 
     def count(self, im0):
         """Main counting function to track objects and store counts in the file."""
+        #self.results = self.model(im0)
+        
+        #if not self.results:
+         #   return im0  # No detections, return the original frame
+
         if not self.region_initialized:
             self.initialize_region()
             self.region_initialized = True
@@ -94,6 +113,7 @@ class ObjectCounter(BaseSolution):
         self.annotator.draw_region(reg_pts=self.region, color=(104, 0, 123), thickness=self.line_width * 2)
 
         for box, track_id, cls in zip(self.boxes, self.track_ids, self.clss):
+
             self.store_tracking_history(track_id, box)
 
             if track_id not in self.trk_pt:
@@ -104,11 +124,20 @@ class ObjectCounter(BaseSolution):
             speed_label = f"{int(self.spd[track_id] * 0.621371)} mph" if track_id in self.spd else self.names[int(cls)]
             self.annotator.draw_centroid_and_tracks(self.track_line, color=colors(int(track_id), True), track_thickness=self.line_width)
             
-            # Always update speed estimation, regardless of intersection with line
+            # Update speed estimation
+            previous_speed = self.spd.get(track_id, 0)  # Store previous speed
             time_difference = time() - self.trk_pt.get(track_id, time())
             if time_difference > 0:
                 distance_moved = np.linalg.norm(np.array(self.track_line[-1]) - np.array(self.trk_pp.get(track_id, self.track_line[-1])))
                 self.spd[track_id] = distance_moved / time_difference  # Pixels per second
+            
+            # If speed increases by 40% (FOR NOW), and trail is going south, ALERT
+            if self.spd[track_id] > previous_speed * 1.4:
+                current_y = self.track_line[-1][1]
+                previous_y = self.trk_pp[track_id][1]
+            
+                if current_y > previous_y:  # Temp Alert
+                    print(f"Object {track_id} is accelerating south. Speed: {self.spd[track_id]:.2f} pixels/sec")
 
             self.trk_pt[track_id] = time()
             self.trk_pp[track_id] = self.track_line[-1]
@@ -116,6 +145,7 @@ class ObjectCounter(BaseSolution):
             self.trk_pt[track_id] = time()
             self.trk_pp[track_id] = self.track_line[-1]
 
+            # Tracking center
             current_centroid = ((box[0] + box[2]) / 2, (box[1] + box[3]) / 2)
             prev_position = self.track_history[track_id][-2] if len(self.track_history[track_id]) > 1 else None
             self.count_objects(current_centroid, track_id, prev_position, cls)

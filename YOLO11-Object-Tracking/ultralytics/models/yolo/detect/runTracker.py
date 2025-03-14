@@ -25,7 +25,7 @@ region_points = [(100,352), (900, 352)]
 # Initialize the object counter
 counter = ObjectCounter(
     region=region_points,
-    model=os.path.join(os.getcwd(), "yolo11n.pt"),
+    model=os.path.join(os.getcwd(), "yolo11s.pt"), # Update to test other models (n, s, or m)
     classes=[0,1,2,3,5,7],
     show_in=True,
     show_out=True,
