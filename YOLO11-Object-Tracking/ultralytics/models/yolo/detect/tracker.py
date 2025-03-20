@@ -5,7 +5,7 @@ import pandas as pd
 from datetime import datetime
 import numpy as np
 from time import time
-from ultralytics.solutions.solutions import BaseSolution
+from ultralytics.solutions.solutions import BaseSolution #, SolutionAnnotator
 from ultralytics.utils.plotting import Annotator, colors
 
 class ObjectCounter(BaseSolution):
@@ -104,6 +104,7 @@ class ObjectCounter(BaseSolution):
             self.initialize_region()
             self.region_initialized = True
 
+        # self.annotator = SolutionAnnotator(im0, line_width=self.line_width)
         self.annotator = Annotator(im0, line_width=self.line_width)
         self.extract_tracks(im0)
         self.annotator.draw_region(reg_pts=self.region, color=(104, 0, 123), thickness=self.line_width * 2)
