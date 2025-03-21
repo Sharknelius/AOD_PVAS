@@ -1,5 +1,7 @@
 from ultralytics import YOLO
+import torch
 
-model = YOLO("yolo11s.pt")
+if __name__ ==  '__main__':
+    model = YOLO("yolo11.yaml")
 
-model.train(data="../../../cfg/datasets/weapons-data.yaml", epochs=1, time=2.0, dropout = 0.25, plots=True)
+    model.train(data="../../../cfg/datasets/coco-and-weapons-data.yaml", epochs=25, dropout = 0.25, plots=True, batch=16, device=0)

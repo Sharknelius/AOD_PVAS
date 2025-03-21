@@ -1,0 +1,13 @@
+train: D:/SP25/SeniorDesign2/actual-yolo-coco-dataset/train/images
+val: D:/SP25/SeniorDesign2/actual-yolo-coco-dataset/valid/images
+test: # ../../../../actual-yolo-coco-dataset/test/images
+
+nc: 81
+names: ['airplane', 'apple', 'backpack', 'banana', 'baseball bat', 'baseball glove', 'bear', 'bed', 'bench', 'bicycle', 'bird', 'boat', 'book', 'bottle', 'bowl', 'broccoli', 'bus', 'cake', 'car', 'carrot', 'cat', 'cell phone', 'chair', 'clock', 'couch', 'cow', 'cup', 'dining table', 'dog', 'donut', 'elephant', 'fire hydrant', 'fork', 'frisbee', 'giraffe', 'hair drier', 'handbag', 'horse', 'hot dog', 'keyboard', 'kite', 'knife', 'laptop', 'microwave', 'motorcycle', 'mouse', 'orange', 'oven', 'parking meter', 'person', 'pizza', 'potted plant', 'refrigerator', 'remote', 'sandwich', 'scissors', 'sheep', 'sink', 'skateboard', 'skis', 'snowboard', 'spoon', 'sports ball', 'stop sign', 'suitcase', 'surfboard', 'teddy bear', 'tennis racket', 'tie', 'toaster', 'toilet', 'toothbrush', 'traffic light', 'train', 'truck', 'tv', 'umbrella', 'vase', 'wine glass', 'zebra', 'gun']
+
+roboflow:
+  workspace: cocotoyolo-rg00w
+  project: coco_to_yolo11
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/cocotoyolo-rg00w/coco_to_yolo11/dataset/1
