@@ -12,3 +12,9 @@ roboflow:
   version: 1
   license: CC BY 4.0
   url: https://universe.roboflow.com/cocotoyolo-rg00w/vehicles-coco-to-yolo/dataset/1
+
+# This dataset is 3 datasets combined
+# List of all datasets used:
+#   1. COCO 2017 https://cocodataset.org/#download
+#   2. Weapon-detection https://universe.roboflow.com/weapon-goncr/weapon-detection-rjed0-zo1wn/dataset/2/download/yolov11
+#   3. Labeled Guns data for Object detection https://www.kaggle.com/datasets/shivanirana63/labeled-guns-data-for-object-detection
