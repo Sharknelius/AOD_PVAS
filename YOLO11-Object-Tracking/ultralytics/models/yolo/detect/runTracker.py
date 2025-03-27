@@ -13,7 +13,7 @@ ret = False # Set to true if recording live
 if ret:
     cap = cv2.VideoCapture(0) # Live video feed
 else:
-    cap = cv2.VideoCapture('gun_test1.mp4') # Load mp4
+    cap = cv2.VideoCapture('test3.mp4') # Load mp4
 
 # Get the default frame width and height
 frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -25,7 +25,7 @@ region_points = [(100,352), (900, 352)]
 # Initialize the object counter
 counter = ObjectCounter(
     region=region_points,
-    model=os.path.join(os.getcwd(), "AOD_weapons.pt"), # Update to test other models (n, s, or m)
+    model=os.path.join(os.getcwd(), "AOD_weapons2.pt"), # Update to test other models (n, s, or m)
     classes=[0, 1, 2, 3, 4, 5],
     show_in=True,
     show_out=True,
