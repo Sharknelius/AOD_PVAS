@@ -2,12 +2,6 @@ import os
 import cv2
 from tracker import ObjectCounter  # Importing ObjectCounter from tracker.py
 
-# Define the mouse callback function
-def RGB(event, x, y, flags, param):
-    if event == cv2.EVENT_MOUSEMOVE:  # Check for mouse movement
-        point = [x, y]
-        print(f"Mouse moved to: {point}")
-
 ret = False # Set to true if recording live
 
 if ret:
@@ -34,7 +28,6 @@ counter = ObjectCounter(
 
 # Create a named window and set the mouse callback
 cv2.namedWindow('RGB')
-cv2.setMouseCallback('RGB', RGB)
 
 count = 0
 
