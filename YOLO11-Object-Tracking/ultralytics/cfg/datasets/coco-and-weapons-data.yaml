@@ -15,6 +15,8 @@ roboflow:
 
 # This dataset is 3 datasets combined
 # List of all datasets used:
-#   1. COCO 2017 https://cocodataset.org/#download
-#   2. Weapon-detection https://universe.roboflow.com/weapon-goncr/weapon-detection-rjed0-zo1wn/dataset/2/download/yolov11
-#   3. Labeled Guns data for Object detection https://www.kaggle.com/datasets/shivanirana63/labeled-guns-data-for-object-detection
+#  1. COCO 2017 https://cocodataset.org/#download
+#  2. Weapon-detection https://universe.roboflow.com/weapon-goncr/weapon-detection-rjed0-zo1wn/dataset/2/download/yolov11
+#  3. Labeled Guns data for Object detection https://www.kaggle.com/datasets/shivanirana63/labeled-guns-data-for-object-detection
+#  4. Guns-Knives Object Detection https://www.kaggle.com/datasets/iqmansingh/guns-knives-object-detection
+#  5. Vehicle Detection Image Dataset https://www.kaggle.com/datasets/pkdarabi/vehicle-detection-image-dataset
