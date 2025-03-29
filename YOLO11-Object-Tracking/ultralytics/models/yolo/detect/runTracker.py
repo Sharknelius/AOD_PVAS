@@ -7,7 +7,7 @@ ret = False # Set to true if recording live
 if ret:
     cap = cv2.VideoCapture(0) # Live video feed
 else:
-    cap = cv2.VideoCapture('test3.mp4') # Load mp4
+    cap = cv2.VideoCapture('gun_test1.mp4') # Load mp4
 
 # Get the default frame width and height
 frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))

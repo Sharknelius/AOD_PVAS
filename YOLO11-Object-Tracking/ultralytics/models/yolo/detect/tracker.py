@@ -113,83 +113,59 @@ class ObjectCounter(BaseSolution):
         self.extract_tracks(im0)
         self.annotator.draw_region(reg_pts=self.region, color=(104, 0, 123), thickness=self.line_width * 2)
 
-        # Only take speed if the object is a vehicle
-        # I don't know if this actually works
-        if (self.clss != 2 and self.clss != 3):
-            for box, track_id, cls in zip(self.boxes, self.track_ids, self.clss):
+        for box, track_id, cls in zip(self.boxes, self.track_ids, self.clss):
 
-                self.store_tracking_history(track_id, box)
+            # Only take speed if the object is a vehicle
+            if cls in [2, 3]:  
+                print("Approaching weapon detected")
+            if cls not in [0, 1, 4, 5]:  
+                continue  # Skip non-vehicle objects
 
-                if track_id not in self.trk_pt:
-                    self.trk_pt[track_id] = 0
-                if track_id not in self.trk_pp:
-                    self.trk_pp[track_id] = self.track_line[-1]
-                if track_id not in self.trk_pa:
-                    self.trk_pa[track_id] = 1
+            self.store_tracking_history(track_id, box)
 
-                speed_label = f"{int(self.spd[track_id] * 0.621371)} mph" if track_id in self.spd else self.names[int(cls)]
-                self.annotator.draw_centroid_and_tracks(self.track_line, color=colors(int(track_id), True), track_thickness=self.line_width)
-                
-                # New speed estimation
-                current_area = (box[2] - box[0]) * (box[3] - box[1])
-                
-                # Always update speed estimation, regardless of intersection with line
-                previous_spd = self.spd.get(track_id, 0)  # Store previous speed
-                time_difference = time() - self.trk_pt.get(track_id, time())
-                if time_difference > 0:
-                    distance_moved = current_area / self.trk_pa[track_id]
-                    if distance_moved < 1.035 and distance_moved > 0.965:
-                        distance_moved = 0
-                    distance_moved *= 3
-                    self.spd[track_id] = distance_moved / time_difference  # Percentage area change per second
-
-                current_centroid = ((box[0] + box[2]) / 2, (box[1] + box[3]) / 2)
-                prev_position = self.track_history[track_id][-2] if len(self.track_history[track_id]) > 1 else None
-
-                # If speed increases by 40% (FOR NOW), and trail is going south, ALERT
-                if self.spd[track_id] > previous_spd * 1.4:
-                    current_y = self.track_line[-1][1]
-                    previous_y = self.trk_pp[track_id][1]
-                
-                    if current_y > previous_y:  # Temp Alert
-                        print(f"Object {track_id} is accelerating south by {self.spd[track_id]:.2f}")
-
-                self.trk_pt[track_id] = time()
+            if track_id not in self.trk_pt:
+                self.trk_pt[track_id] = 0
+            if track_id not in self.trk_pp:
                 self.trk_pp[track_id] = self.track_line[-1]
+            if track_id not in self.trk_pa:
+                self.trk_pa[track_id] = 1
 
-                self.trk_pt[track_id] = time()
-                self.trk_pp[track_id] = self.track_line[-1]
-                self.trk_pa[track_id] = current_area
+            speed_label = f"{int(self.spd[track_id] * 0.621371)} mph" if track_id in self.spd else self.names[int(cls)]
+            self.annotator.draw_centroid_and_tracks(self.track_line, color=colors(int(track_id), True), track_thickness=self.line_width)
+            
+            # New speed estimation
+            current_area = (box[2] - box[0]) * (box[3] - box[1])
+            
+            # Always update speed estimation, regardless of intersection with line
+            previous_spd = self.spd.get(track_id, 0)  # Store previous speed
+            time_difference = time() - self.trk_pt.get(track_id, time())
+            if time_difference > 0:
+                distance_moved = current_area / self.trk_pa[track_id]
+                if distance_moved < 1.035 and distance_moved > 0.965:
+                    distance_moved = 0
+                distance_moved *= 3
+                self.spd[track_id] = distance_moved / time_difference  # Percentage area change per second
 
-                self.count_objects(current_centroid, track_id, prev_position, cls)
+            current_centroid = ((box[0] + box[2]) / 2, (box[1] + box[3]) / 2)
+            prev_position = self.track_history[track_id][-2] if len(self.track_history[track_id]) > 1 else None
 
-                # Old speed estimation
-                """"
-                previous_speed = self.spd.get(track_id, 0)  # Store previous speed
-                time_difference = time() - self.trk_pt.get(track_id, time())
-                if time_difference > 0:
-                    distance_moved = np.linalg.norm(np.array(self.track_line[-1]) - np.array(self.trk_pp.get(track_id, self.track_line[-1])))
-                    self.spd[track_id] = distance_moved / time_difference  # Pixels per second
-                
-                # If speed increases by 40% (FOR NOW), and trail is going south, ALERT
-                if self.spd[track_id] > previous_speed * 1.4:
-                    current_y = self.track_line[-1][1]
-                    previous_y = self.trk_pp[track_id][1]
-                
-                    if current_y > previous_y:  # Temp Alert
-                        print(f"Object {track_id} is accelerating south. Speed: {self.spd[track_id]:.2f} pixels/sec")
+            # If speed increases by 40% (FOR NOW), and trail is going south, ALERT
+            if self.spd[track_id] > previous_spd * 1.4:
+                current_y = self.track_line[-1][1]
+                previous_y = self.trk_pp[track_id][1]
+            
+                if current_y > previous_y:  # Temp Alert
+                    print(f"Object {track_id} is accelerating south by {self.spd[track_id]:.2f}")
 
-                self.trk_pt[track_id] = time()
-                self.trk_pp[track_id] = self.track_line[-1]
+            self.trk_pt[track_id] = time()
+            self.trk_pp[track_id] = self.track_line[-1]
 
-                self.trk_pt[track_id] = time()
-                self.trk_pp[track_id] = self.track_line[-1]
+            self.trk_pt[track_id] = time()
+            self.trk_pp[track_id] = self.track_line[-1]
+            self.trk_pa[track_id] = current_area
 
-                # Tracking center
-                current_centroid = ((box[0] + box[2]) / 2, (box[1] + box[3]) / 2)
-                prev_position = self.track_history[track_id][-2] if len(self.track_history[track_id]) > 1 else None
-                self.count_objects(current_centroid, track_id, prev_position, cls)
-                """
+            self.count_objects(current_centroid, track_id, prev_position, cls)
+
             
         self.display_counts(im0)
 
