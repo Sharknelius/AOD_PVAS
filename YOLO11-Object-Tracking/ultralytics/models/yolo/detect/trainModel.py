@@ -2,13 +2,13 @@ from ultralytics import YOLO
 import torch
 
 if __name__ ==  '__main__':
-    #model = YOLO("yolo11.yaml")
+    #model = YOLO("yolo11s.yaml")
 
-    #model.train(data="../../../cfg/datasets/coco-and-weapons-data.yaml", epochs=25, dropout = 0.25, plots=True, batch=16, device=0)
+    #model.train(data="../../../cfg/datasets/coco-and-weapons-data.yaml", epochs=25, imgsz=640, dropout = 0.25, plots=True, batch=16, device=0)
 
     # Pretrained model
-    model = YOLO("AOD_weapons2.pt")
+    model = YOLO("yolo11s_AOD1.pt")
 
-    model.train(data="../../../cfg/datasets/coco-and-weapons-data.yaml", epochs=50, dropout = 0.25, plots=True, batch=16, device=0)
+    model.train(data="../../../cfg/datasets/coco-and-weapons-data.yaml", epochs=40, imgsz=640, dropout = 0.25, plots=True, batch=16, device=0)
 
     model.val()
