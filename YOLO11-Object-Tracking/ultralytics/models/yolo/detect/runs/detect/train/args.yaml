@@ -1,6 +1,6 @@
 task: detect
 mode: train
-model: AOD_weapons.pt
+model: yolo11s_AOD1.pt
 data: ../../../cfg/datasets/coco-and-weapons-data.yaml
 epochs: 40
 time: null
