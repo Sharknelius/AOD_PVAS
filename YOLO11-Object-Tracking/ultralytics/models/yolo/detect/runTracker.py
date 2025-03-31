@@ -2,12 +2,8 @@ import os
 import cv2
 from tracker import ObjectCounter  # Importing ObjectCounter from tracker.py
 
-ret = False # Set to true if recording live
 
-if ret:
-    cap = cv2.VideoCapture(0) # Live video feed
-else:
-    cap = cv2.VideoCapture('gun_test1.mp4') # Load mp4
+cap = cv2.VideoCapture(0) # Live video feed
 
 # Get the default frame width and height
 frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -19,14 +15,14 @@ region_points = [(100,352), (900, 352)]
 # Initialize the object counter
 counter = ObjectCounter(
     region=region_points,
-    model=os.path.join(os.getcwd(), "AOD_weapons2.pt"), # Update to test other models (n, s, or m)
+    model=os.path.join(os.getcwd(), "AOD_weapons0.pt"), # Update to test other models (n, s, or m)
     classes=[0, 1, 2, 3, 4, 5],
     show_in=True,
     show_out=True,
     line_width=2,
 )
 
-# Create a named window and set the mouse callback
+# Create a named window
 cv2.namedWindow('RGB')
 
 count = 0
@@ -36,9 +32,6 @@ while True:
     ret, frame = cap.read()
     if not ret:
         break
-        # If video ends, reset to the beginning
-#        cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
-#        continue
     count += 1
     if count % 2 != 0:  # Skip odd frames
         continue

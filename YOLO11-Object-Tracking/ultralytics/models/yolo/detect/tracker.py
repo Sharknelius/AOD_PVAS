@@ -1,15 +1,10 @@
 import cv2
-import glob
-import os
-import pandas as pd
-from datetime import datetime
-import numpy as np
 from time import time
-from ultralytics.solutions.solutions import BaseSolution #, SolutionAnnotator
+from ultralytics.solutions.solutions import BaseSolution
 from ultralytics.utils.plotting import Annotator, colors
 
 class ObjectCounter(BaseSolution):
-    def __init__(self, output_dir="output", output_prefix="output", **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.counted_ids = []
         self.classwise_counts = {}
@@ -21,27 +16,6 @@ class ObjectCounter(BaseSolution):
         self.show_in = self.CFG.get("show_in", True)
         self.show_out = self.CFG.get("show_out", True)
 
-        # Initialize video writer
-        self.video_writer = None
-
-        os.makedirs(output_dir, exist_ok=True)
-        existing_files = glob.glob(os.path.join(output_dir, f"{output_prefix}_*.avi"))
-        file_numbers = [
-            int(f.split("_")[-1].split(".")[0]) for f in existing_files if f.split("_")[-1].split(".")[0].isdigit()
-        ]
-
-        if file_numbers:
-            next_number = max(file_numbers) + 1
-        else:
-            next_number = 1
-
-        self.output_filename = os.path.join(output_dir, f"{output_prefix}_{next_number}.avi")
-
-    def initialize_writer(self, width, height):
-        """Initialize video writer if not already initialized."""
-        if self.video_writer is None:
-            fourcc = cv2.VideoWriter_fourcc(*'XVID') # Use XVID or MJPG codec
-            self.video_writer = cv2.VideoWriter(self.output_filename, fourcc, 20.0, (width, height))
 
     def count_objects(self, current_centroid, track_id, prev_position, cls):
         """Count objects and update file based on centroid movements."""
@@ -169,17 +143,5 @@ class ObjectCounter(BaseSolution):
             
         self.display_counts(im0)
 
-        # Initialize writer with frame dimensions
-        height, width, _ = im0.shape
-        self.initialize_writer(width, height)
-
-        # Write frame to video
-        self.video_writer.write(im0)
-
         return im0
     
-    def close(self):
-        """Release the video writer."""
-        if self.video_writer:
-            self.video_writer.release()
-            print(f"Video saved as {self.output_filename}")
