@@ -3,7 +3,7 @@ import cv2
 from tracker import ObjectCounter  # Importing ObjectCounter from tracker.py
 
 
-cap = cv2.VideoCapture(192.168.5.66) # Live video feed
+cap = cv2.VideoCapture("192.168.5.66") # Live video feed
 
 # Get the default frame width and height
 frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
