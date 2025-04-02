@@ -1,4 +1,3 @@
-import cv2
 from time import time
 from ultralytics.solutions.solutions import BaseSolution
 from ultralytics.utils.plotting import Annotator, colors
@@ -22,33 +21,16 @@ class ObjectCounter(BaseSolution):
         if prev_position is None or track_id in self.counted_ids:
             return
 
-        # For future use
-        action = None
-
         # Handle linear region counting
         if len(self.region) == 2:
             line = self.LineString(self.region)
             if line.intersects(self.LineString([prev_position, current_centroid])):
-                if abs(self.region[0][0] - self.region[1][0]) < abs(self.region[0][1] - self.region[1][1]):
-                    if current_centroid[0] > prev_position[0]:
-                        action = "IN"
-                    else:
-                        action = "OUT"
-                else:
-                    if current_centroid[1] > prev_position[1]:
-                        action = "IN"
-                    else:
-                        action = "OUT"
                 self.counted_ids.append(track_id)
 
         # Handle polygonal region counting
         elif len(self.region) > 2:
             polygon = self.Polygon(self.region)
             if polygon.contains(self.Point(current_centroid)):
-                if current_centroid[0] > prev_position[0]:
-                    action = "IN"
-                else:
-                    action = "OUT"
                 self.counted_ids.append(track_id)
 
     def display_counts(self, im0):
@@ -82,7 +64,6 @@ class ObjectCounter(BaseSolution):
             self.initialize_region()
             self.region_initialized = True
 
-        # self.annotator = SolutionAnnotator(im0, line_width=self.line_width)
         self.annotator = Annotator(im0, line_width=self.line_width)
         self.extract_tracks(im0)
         self.annotator.draw_region(reg_pts=self.region, color=(104, 0, 123), thickness=self.line_width * 2)
@@ -104,7 +85,6 @@ class ObjectCounter(BaseSolution):
             if track_id not in self.trk_pa:
                 self.trk_pa[track_id] = 1
 
-            speed_label = f"{int(self.spd[track_id] * 0.621371)} mph" if track_id in self.spd else self.names[int(cls)]
             self.annotator.draw_centroid_and_tracks(self.track_line, color=colors(int(track_id), True), track_thickness=self.line_width)
             
             # New speed estimation
