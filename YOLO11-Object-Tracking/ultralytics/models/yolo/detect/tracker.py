@@ -12,9 +12,8 @@ class ObjectCounter(BaseSolution):
         self.trk_pt = {}
         self.trk_pp = {}
         self.trk_pa = {} # new
-        self.show_in = self.CFG.get("show_in", True)
-        self.show_out = self.CFG.get("show_out", True)
-
+        self.show_in = None
+        self.show_out = None
 
     def count_objects(self, current_centroid, track_id, prev_position, cls):
         """Count objects and update file based on centroid movements."""

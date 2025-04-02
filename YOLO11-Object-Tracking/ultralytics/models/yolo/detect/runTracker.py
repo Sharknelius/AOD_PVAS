@@ -3,8 +3,8 @@ import cv2
 from tracker import ObjectCounter  # Importing ObjectCounter from tracker.py
 
 
-# cap = cv2.VideoCapture(0) # Live video feed
-cap = cv2.VideoCapture("rtsp://192.168.5.66")
+cap = cv2.VideoCapture(0) # Live video feed
+# cap = cv2.VideoCapture("rtsp://192.168.5.66")
 
 # Get the default frame width and height
 frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -18,9 +18,10 @@ counter = ObjectCounter(
     region=region_points,
     model=os.path.join(os.getcwd(), "yolo11s_AOD2.pt"), # Update to test other models (n, s, or m)
     classes=[0, 1, 2, 3, 4, 5],
-    show_in=True,
-    show_out=True,
+    show_in=False,
+    show_out=False,
     line_width=2,
+    verbose=False,
 )
 
 # Create a named window
