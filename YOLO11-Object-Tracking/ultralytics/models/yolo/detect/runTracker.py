@@ -11,12 +11,12 @@ frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
 # Define region points for counting
-region_points = [(100,352), (900, 352)]
+region_points = [(100,400), (900, 400)]
 
 # Initialize the object counter
 counter = ObjectCounter(
     region=region_points,
-    model=os.path.join(os.getcwd(), "yolo11s_AOD2.pt"), # Update to test other models (n, s, or m)
+    model=os.path.join(os.getcwd(), "yolo11s_AOD3.pt"), # Update to test other models (n, s, or m)
     classes=[0, 1, 2, 3, 4, 5],
     show_in=False,
     show_out=False,
