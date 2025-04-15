@@ -1,17 +1,10 @@
-train: D:/SP25/SeniorDesign2/vehicle-weapons-dataset/train/images
-val: D:/SP25/SeniorDesign2/vehicle-weapons-dataset/valid/images
-test: D:/SP25/SeniorDesign2/vehicle-weapons-dataset/test/images
+train: ../train/images
+val: ../val/images
+test: ../test/images # Update these to where your data is actually located
 
 nc: 6
 names: ['bus', 'car', 'gun', 'sharp object', 'motorcycle', 'truck']
 # bus = 0, car = 1, gun = 2, sharp object = 3, motocycle = 4, truck = 5
-
-roboflow:
-  workspace: cocotoyolo-rg00w
-  project: vehicles-coco-to-yolo
-  version: 1
-  license: CC BY 4.0
-  url: https://universe.roboflow.com/cocotoyolo-rg00w/vehicles-coco-to-yolo/dataset/1
 
 # This dataset is 3 datasets combined
 # List of all datasets used:

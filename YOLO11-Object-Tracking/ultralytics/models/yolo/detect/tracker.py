@@ -1,11 +1,8 @@
 import cv2
 import glob
 import os
-import pandas as pd
-from datetime import datetime
-import numpy as np
 from time import time
-from ultralytics.solutions.solutions import BaseSolution #, SolutionAnnotator
+from ultralytics.solutions.solutions import BaseSolution
 from ultralytics.utils.plotting import Annotator, colors
 
 class ObjectCounter(BaseSolution):
@@ -17,13 +14,15 @@ class ObjectCounter(BaseSolution):
         self.spd = {}
         self.trk_pt = {}
         self.trk_pp = {}
-        self.trk_pa = {} # new
+        self.trk_pa = {}
         self.show_in = self.CFG.get("show_in", True)
         self.show_out = self.CFG.get("show_out", True)
 
         # Initialize video writer
         self.video_writer = None
 
+        # Allow for output.avi videos to be generated
+        # These will have the bounding box annotations
         os.makedirs(output_dir, exist_ok=True)
         existing_files = glob.glob(os.path.join(output_dir, f"{output_prefix}_*.avi"))
         file_numbers = [
@@ -48,33 +47,16 @@ class ObjectCounter(BaseSolution):
         if prev_position is None or track_id in self.counted_ids:
             return
 
-        # For future use
-        action = None
-
         # Handle linear region counting
         if len(self.region) == 2:
             line = self.LineString(self.region)
             if line.intersects(self.LineString([prev_position, current_centroid])):
-                if abs(self.region[0][0] - self.region[1][0]) < abs(self.region[0][1] - self.region[1][1]):
-                    if current_centroid[0] > prev_position[0]:
-                        action = "IN"
-                    else:
-                        action = "OUT"
-                else:
-                    if current_centroid[1] > prev_position[1]:
-                        action = "IN"
-                    else:
-                        action = "OUT"
                 self.counted_ids.append(track_id)
 
         # Handle polygonal region counting
         elif len(self.region) > 2:
             polygon = self.Polygon(self.region)
             if polygon.contains(self.Point(current_centroid)):
-                if current_centroid[0] > prev_position[0]:
-                    action = "IN"
-                else:
-                    action = "OUT"
                 self.counted_ids.append(track_id)
 
     def display_counts(self, im0):
@@ -117,7 +99,7 @@ class ObjectCounter(BaseSolution):
 
             # Only take speed if the object is a vehicle
             if cls in [2, 3]:  
-                print("Approaching weapon detected")
+                print("Approaching weapon detected") # Temporary weapon alert
             if cls not in [0, 1, 4, 5]:  
                 continue  # Skip non-vehicle objects
 
@@ -133,7 +115,7 @@ class ObjectCounter(BaseSolution):
             speed_label = f"{int(self.spd[track_id] * 0.621371)} mph" if track_id in self.spd else self.names[int(cls)]
             self.annotator.draw_centroid_and_tracks(self.track_line, color=colors(int(track_id), True), track_thickness=self.line_width)
             
-            # New speed estimation
+            # New speed estimation based on bounding box size
             current_area = (box[2] - box[0]) * (box[3] - box[1])
             
             # Always update speed estimation, regardless of intersection with line
@@ -150,11 +132,12 @@ class ObjectCounter(BaseSolution):
             prev_position = self.track_history[track_id][-2] if len(self.track_history[track_id]) > 1 else None
 
             # If speed increases by 40% (FOR NOW), and trail is going south, ALERT
+            # This should be updated to more accurate instead of simply using 40%
             if self.spd[track_id] > previous_spd * 1.4:
                 current_y = self.track_line[-1][1]
                 previous_y = self.trk_pp[track_id][1]
             
-                if current_y > previous_y:  # Temp Alert
+                if current_y > previous_y:  # Temporary accelerating vehicle alert
                     print(f"Object {track_id} is accelerating south by {self.spd[track_id]:.2f}")
 
             self.trk_pt[track_id] = time()

@@ -2,7 +2,7 @@ import os
 import cv2
 from tracker import ObjectCounter  # Importing ObjectCounter from tracker.py
 
-ret = False # Set to true if recording live
+ret = False # Set to True if recording live
 
 if ret:
     cap = cv2.VideoCapture(0) # Live video feed
@@ -16,13 +16,13 @@ frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 # Define region points for counting
 region_points = [(100, 400), (900, 400)]
 
-# Initialize the object counter
+# Initialize the Object Counter
 counter = ObjectCounter(
     region=region_points,
-    model=os.path.join(os.getcwd(), "yolo11s_AOD3.pt"), # Update to test other models (n, s, or m)
+    model=os.path.join(os.getcwd(), "yolo11s_AOD3.pt"), # Update to test other models
     classes=[0, 1, 2, 3, 4, 5],
-    show_in=True,
-    show_out=True,
+    show_in=False,
+    show_out=False,
     line_width=2,
 )
 
@@ -40,7 +40,7 @@ while True:
 #        cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 #        continue
     count += 1
-    if count % 2 != 0:  # Skip odd frames
+    if count % 2 != 0:  # Skip odd frames, try increasing this if you must
         continue
 
     frame = cv2.resize(frame, (1020, 500))
