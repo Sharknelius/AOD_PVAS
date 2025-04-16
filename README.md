@@ -17,4 +17,5 @@ The list of commands to run once in the root directory:
 cd YOLO11-Object-Tracking/ultralytics/detect
 python runTracker.py
 ```
-This will output a video with bounding box annotations.
+This will output a video with bounding box annotations. Here is an example:
+![alt text](https://github.com/Sharknelius/AOD_PVAS/blob/main/Documentation/GitHubImages/previewAODImage.png?raw=true)
