@@ -2,7 +2,7 @@ import os
 import cv2
 from tracker import ObjectCounter  # Importing ObjectCounter from tracker.py
 
-ret = False # Set to true if recording live
+ret = True # Set to true if recording live
 
 if ret:
     cap = cv2.VideoCapture(0) # Live video feed
@@ -24,6 +24,7 @@ counter = ObjectCounter(
     show_in=True,
     show_out=True,
     line_width=2,
+    verbose=False,
 )
 
 # Create a named window and set the mouse callback
