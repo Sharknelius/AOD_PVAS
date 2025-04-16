@@ -10,7 +10,7 @@ pip install opencv-python>=4.11.0.86 -- user
 ```
 Once repo is downloaded, cd into "YOLO11-Object-Tracking/ultralytics" and run "pip install -r requirements.txt" to install all necessary Python libraries.
 ## Run Code
-To run the code, cd into "YOLO11-Object-Tracking/ultralytics/detect" and run the command "python runTracker.py." This will run the current model defined in runTracker.py. The model will detect any vehicles or weapons it finds in the live video feed passed into the tracker.py file. The video feed and model being used can be modified in runTracker.py.
+To run the code, cd into "YOLO11-Object-Tracking/ultralytics/detect" and run the command "python runTracker.py." This will run the current model defined in runTracker.py. The model will detect any vehicles or weapons in the live video feed passed into the tracker.py file. The video feed and model being used can be modified in runTracker.py.
 
 The list of commands to run once in the root directory:
 ```
@@ -19,3 +19,5 @@ python runTracker.py
 ```
 This will output a video with bounding box annotations. Here is an example:
 ![alt text](https://github.com/Sharknelius/AOD_PVAS/blob/main/Documentation/GitHubImages/previewAODImage.png?raw=true)
+
+For further explanation of the subsystem go to [AOD_DESC.md](Documentation/AOD_DESC.md)
