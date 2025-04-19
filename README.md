@@ -17,7 +17,9 @@ The list of commands to run once in the root directory:
 cd YOLO11-Object-Tracking/ultralytics/detect
 python runTracker.py
 ```
-This will output a video with bounding box annotations. Here is an example:
+This will create a live video feed, which will draw bounding boxes around detected objects and estimate the speed of moving vehicles. Here is an example of the video feed:
 ![alt text](https://github.com/Sharknelius/AOD_PVAS/blob/main/Documentation/GitHubImages/previewAODImage.png?raw=true)
+## Code changes for IP camera
+Within YOLO11-Object-Tracking/ultralytics/detect/runTracker.py file the 'cap' variable at the beginning of the document can be changed to support an IP camera. Below the initialization of the variable there is a commented line that shows an example initialization of the 'cap' variable with an IP camera rather than a basic webcam. Change the IP in this line of code to match the IP of the camera which will be used.
 
 For further explanation of the subsystem go to [AOD_DESC.md](Documentation/AOD_DESC.md)
