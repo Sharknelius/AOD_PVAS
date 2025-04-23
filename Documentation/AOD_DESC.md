@@ -7,7 +7,7 @@ Other branches were used for development.
 ## Dependency Explanation
 **Ultralytics:** Used for tracking objects between frames and creating bounding boxes of differing colors for different objects in the main branch. Used for training the YOLO model in the develop branch. Here is [Ultralytics' GitHub Repository](https://github.com/ultralytics) and [ultralytics' website](https://www.ultralytics.com). <br/>
 **YOLO11:** You Only Look Once (YOLO) provides real-time object detection. Here is [Yolo's GitHub Repository](https://github.com/ultralytics/ultralytics) and the [documentation for YOLO](https://docs.ultralytics.com/).<br/>
-**OpenCV-Python:** A library of Python bindings designed to solve computer vision problems. Here is [OpenCV's GitHub Repository](https://github.com/opencv/opencv) and [OpenCV's website](https://opencv.org).<br/>
+**OpenCV-Python:** A library of Python bindings designed to solve computer vision problems. Allows for a live video feed to be processed by the model. Here is [OpenCV's GitHub Repository](https://github.com/opencv/opencv) and [OpenCV's website](https://opencv.org).<br/>
 **Glob:** Used for output avi files in the Develop branch. This allows for multiple output videos to be saved after running the model so they can be reviewed later. Glob is actually a built-in Python library with [in-depth documentation](https://docs.python.org/3/library/glob.html), and Glob2 is an extention with more versatility. Here's more [information on Glob2](https://pypi.org/project/glob2/0.4.1/).<br/>
 
 ## Subsystem's Current State
